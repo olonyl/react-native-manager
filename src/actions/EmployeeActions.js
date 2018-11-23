@@ -1,7 +1,8 @@
 import {
     EMPLOYEE_UPDATE,
     EMPLOYEE_CREATE,
-    EMPLOYEES_FETCH_SUCCESS
+    EMPLOYEES_FETCH_SUCCESS,
+    EMPLOYEES_SAVE_SUCCESS
 } from './types';
 import firebase from '@firebase/app'
 import '@firebase/auth'
@@ -35,4 +36,16 @@ export const employeesFetch = () => {
                 dispatch({ type: EMPLOYEES_FETCH_SUCCESS, payload: snapshot.val() })
             })
     }
-} 
+}
+
+export const employeeSave = ({ name, phone, shift, uid }) => {
+    const { currentUser } = firebase.auth();
+    return (dispatch) => {
+        firebase.database().ref(`/users/${currentUser.uid}/employees/${uid}`)
+            .set({ name, phone, shift })
+            .then(() => {
+                dispatch({ type: EMPLOYEES_SAVE_SUCCESS })
+                Actions.employeeList({ type: 'reset' })
+            })
+    }
+}
